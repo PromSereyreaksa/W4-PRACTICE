@@ -1,17 +1,24 @@
-
 import 'package:flutter/material.dart';
 
 import '../../providers/theme_color_provider.dart';
+import 'package:provider/provider.dart';
 import '../../theme/theme.dart';
 import 'widget/theme_color_button.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
- 
+
   @override
   Widget build(BuildContext context) {
+    final themeProvider = context.watch<ThemeColorProvider>();
+    // a way for any widget in the tree to acccess the objeect that the provider is holding,
+    // <ThemeColorProvider> is the object we want to access,
+    // then assign it to themeProvider variable
+    // themeProider now points to the same ThemeColorProvider object that ChangeNotifierProvider made.
+
     return Container(
-      color: currentThemeColor.backgroundColor,
+      color: themeProvider.current.backgroundColor,
+      // when we change the themeProvider.current it calls the notifyListener(), which it rebuilds any widget that listen to this provider.
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -19,7 +26,7 @@ class SettingsScreen extends StatelessWidget {
           Text(
             "Settings",
             style: AppTextStyles.heading.copyWith(
-              color: currentThemeColor.color,
+              color: themeProvider.current.color,
             ),
           ),
 
@@ -38,8 +45,11 @@ class SettingsScreen extends StatelessWidget {
                 .map(
                   (theme) => ThemeColorButton(
                     themeColor: theme,
-                    isSelected: theme == currentThemeColor,
-                    onTap: (value) { },
+                    isSelected: theme == themeProvider.current.color,
+                    onTap: (value) {
+                      themeProvider.current = value;
+                      // notifyListeners() is called inside the object.
+                    },
                   ),
                 )
                 .toList(),
@@ -49,4 +59,3 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 }
- 
